@@ -99,7 +99,8 @@ class AchFile(object):
             entry.dfi_acnt_num = record['account_number']
             entry.amount = int(round(float(record['amount']) * 100))
             entry.ind_name = record['name'].upper()[:22]
-            entry.trace_num = trace_num
+
+            entry.trace_num = record['trace_num']
 
             entries.append((entry, record.get('addenda', [])))
             entry_counter += 1

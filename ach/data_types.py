@@ -322,6 +322,7 @@ class BatchHeader(Ach):
 
         self.settlement_date = self.make_space(3)
 
+
         if cmpy_dis_data != '':
           self.cmpy_dis_data = self.validate_alpha_numeric_field(
               cmpy_dis_data, self.field_lengths['cmpy_dis_data']
@@ -502,7 +503,9 @@ class EntryDetail(Ach):
         'chk_serial_num'        : [9, #POP
                                     15,], #ARC, BOC
         'ind_name'              : [15, #CIE, MTE
-                                    22,], #ARC, BOC, CCD, PPD, TEL, POP, POS, WEB, PREMIUM
+                                    20, #WEB, PREMIUM
+                                    22, #ARC, BOC, CCD, PPD, TEL, POP, POS
+                                    ], 
         'disc_data'             : 2,
         'id_number'             : 15,
         'ind_id'                : 22,
@@ -562,6 +565,10 @@ class EntryDetail(Ach):
                     self.__setattr__(key, self.make_zero(self.field_lengths[key]))
 
             elif key in self.alpha_numeric_fields:
+                if key == 'id_number':
+                    self.__setattr__(
+                        key, self.make_space(self.field_lengths[key])
+                    )
                 self.__setattr__(
                     key, self.make_space(self.field_lengths[key])
                 )
@@ -579,9 +586,13 @@ class EntryDetail(Ach):
                 value = self.validate_alpha_numeric_field(
                     value, self.field_lengths[name][0]
                 )
-            elif name == 'ind_name':
+            if name == 'ind_name' and self.std_ent_cls_code in ['WEB', 'PREMIUM']:
                 value = self.validate_alpha_numeric_field(
                     value, self.field_lengths[name][1]
+                )
+            elif name == 'ind_name':
+                value = self.validate_alpha_numeric_field(
+                    value, self.field_lengths[name][2]
                 )
 
             # Special handling for Check serial number field
@@ -687,20 +698,14 @@ class EntryDetail(Ach):
                 self.ind_name +\
                 self.disc_data
 
-        elif self.std_ent_cls_code == 'WEB':
+        elif self.std_ent_cls_code == 'WEB' or self.std_ent_cls_code == 'PREMIUM':
             ret_string += self.id_number +\
                 self.ind_name +\
-                self.pmt_type_code
-            
-            
-        elif self.std_ent_cls_code == 'PREMIUM':
-            ret_string += self.id_number +\
-                self.ind_name +\
+                self.disc_data +\
                 self.pmt_type_code
 
         ret_string += self.add_rec_ind +\
             self.trace_num
-
         return ret_string
 
     def get_count(self):

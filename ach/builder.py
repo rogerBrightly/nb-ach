@@ -48,6 +48,7 @@ class AchFile(object):
         
         batch_id = batch_entries[0]['batch_id'] or len(batch_entries) + 1
         cmpy_dis_data = batch_entries[0]['company_discretionary_data'] or ''
+
         trace_num = batch_entries[0]['trace_num'] or ''
         id_number = batch_entries[0]['id_number'] or ''
 
@@ -99,6 +100,8 @@ class AchFile(object):
             entry.dfi_acnt_num = record['account_number']
             entry.amount = int(round(float(record['amount'])))
             entry.ind_name = record['name'].upper()[:22]
+
+            entry.disc_data = record['discretionary_data']
 
             entry.trace_num = record['trace_num']
 

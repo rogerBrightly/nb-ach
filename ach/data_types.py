@@ -503,7 +503,6 @@ class EntryDetail(Ach):
         'chk_serial_num'        : [9, #POP
                                     15,], #ARC, BOC
         'ind_name'              : [15, #CIE, MTE
-                                    20, #WEB, PREMIUM
                                     22, #ARC, BOC, CCD, PPD, TEL, POP, POS
                                     ], 
         'disc_data'             : 2,
@@ -586,13 +585,9 @@ class EntryDetail(Ach):
                 value = self.validate_alpha_numeric_field(
                     value, self.field_lengths[name][0]
                 )
-            if name == 'ind_name' and self.std_ent_cls_code in ['WEB', 'PREMIUM']:
-                value = self.validate_alpha_numeric_field(
-                    value, self.field_lengths[name][1]
-                )
             elif name == 'ind_name':
                 value = self.validate_alpha_numeric_field(
-                    value, self.field_lengths[name][2]
+                    value, self.field_lengths[name][1]
                 )
 
             # Special handling for Check serial number field
@@ -701,8 +696,7 @@ class EntryDetail(Ach):
         elif self.std_ent_cls_code == 'WEB' or self.std_ent_cls_code == 'PREMIUM':
             ret_string += self.id_number +\
                 self.ind_name +\
-                self.disc_data +\
-                self.pmt_type_code
+                self.disc_data 
 
         ret_string += self.add_rec_ind +\
             self.trace_num
